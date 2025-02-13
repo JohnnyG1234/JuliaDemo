@@ -37,8 +37,41 @@ function histo()
     gif(anim, "anim.mp4", fps=15)
 end
 
+function game_of_life()
+    theme(:dracula ::Symbol;)
+    n = 100
+    my_matrix = zeros(Int8, 100, 160)
+
+    anim = @animate for i in 1:n 
+        my_matrix[rand(1:100), rand(1:160)] = 1
+        heatmap(my_matrix, color = :greys) 
+    end
+
+    gif(anim, "anim.mp4", fps=30)
+end
+
+function get_neighbors(x, y)
+    neighbors = []
+    push!(neighbors, [x+1, y])
+    push!(neighbors, [x-1, y])
+    push!(neighbors, [x, y+1])
+    push!(neighbors, [x, y-1])
+    push!(neighbors, [x-1, y-1])
+    push!(neighbors, [x+1, y+1])
+    push!(neighbors, [x-1, y+1])
+    push!(neighbors, [x+1, y-1])
+
+    neighbors
+end
+
 
 function main()
-    @time histo()
+    
+    #@time histo()
+    game_of_life()
+
 end
+
+
+
 main()
