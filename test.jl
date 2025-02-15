@@ -43,7 +43,7 @@ function game_of_life()
     my_matrix = generate_starting_pos()
 
     anim = @animate for i in 1:n 
-        
+        heatmap(my_matrix, color = :greys) 
         # looping through 2d array with one for loop!!!
         #  https://julialang.org/blog/2016/02/iteration/ more cool Julia looping methods
         for i in CartesianIndices(my_matrix)
@@ -76,12 +76,7 @@ function game_of_life()
                 end
             end
             
-
         end
-
-
-        println(my_matrix)
-        heatmap(my_matrix, color = :greys) 
     end
 
     gif(anim, "anim.mp4", fps=30)
@@ -103,7 +98,7 @@ end
 
 function generate_starting_pos()
     my_matrix = zeros(Int8, 100, 100)
-    spawn_chance = 5
+    spawn_chance = 20
 
     # can loop through a row or an index in multidimensional array
     for row in eachrow(my_matrix)
