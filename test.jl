@@ -40,10 +40,47 @@ end
 function game_of_life()
     theme(:dracula ::Symbol;)
     n = 100
-    my_matrix = zeros(Int8, 100, 160)
+    my_matrix = generate_starting_pos()
 
     anim = @animate for i in 1:n 
-        my_matrix[rand(1:100), rand(1:160)] = 1
+        
+        # looping through 2d array with one for loop!!!
+        #  https://julialang.org/blog/2016/02/iteration/ more cool Julia looping methods
+        for i in CartesianIndices(my_matrix)
+            # Julia tuples not zero indexed for some reason.... mathematician moment 🤮
+            neighbors = get_neighbors(i[1], i[2])
+
+            neighbor_count = 0
+            for n in eachindex(neighbors)
+                i = neighbors[n][1]
+                j = neighbors[n][2]
+
+                try
+                    if my_matrix[i, j] == 1
+                        neighbor_count += 1
+                    end
+                catch
+                end
+            end
+            
+            # if cell is alone or to crowded it dies
+            if my_matrix[i] == 1
+                if neighbor_count <= 1
+                    my_matrix[i] = 0 
+                elseif neighbor_count >= 4
+                    my_matrix[i] = 0 
+                end
+            else
+                if neighbor_count == 1
+                    my_matrix[i] = 1
+                end
+            end
+            
+
+        end
+
+
+        println(my_matrix)
         heatmap(my_matrix, color = :greys) 
     end
 
@@ -64,11 +101,31 @@ function get_neighbors(x, y)
     neighbors
 end
 
+function generate_starting_pos()
+    my_matrix = zeros(Int8, 100, 100)
+    spawn_chance = 5
+
+    # can loop through a row or an index in multidimensional array
+    for row in eachrow(my_matrix)
+        for i in eachindex(row)
+            chance = rand(1:100)
+            if chance <= spawn_chance
+                row[i] = 1
+            end
+        end
+    end
+    
+
+    my_matrix
+end
 
 function main()
     
     #@time histo()
-    game_of_life()
+
+    # using the time macro to track performance
+    @time game_of_life()
+    
 
 end
 
