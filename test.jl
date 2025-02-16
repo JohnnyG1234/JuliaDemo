@@ -49,7 +49,7 @@ function game_of_life()
         for i in CartesianIndices(my_matrix)
             # Julia tuples not zero indexed for some reason.... mathematician moment 🤮
             neighbors = get_neighbors(i[1], i[2])
-
+            
             neighbor_count = 0
             for n in eachindex(neighbors)
                 i = neighbors[n][1]
@@ -60,9 +60,10 @@ function game_of_life()
                         neighbor_count += 1
                     end
                 catch
+                    continue
                 end
             end
-            
+            println(neighbor_count)
             # if cell is alone or to crowded it dies
             if my_matrix[i] == 1
                 if neighbor_count <= 1
@@ -115,11 +116,27 @@ function generate_starting_pos()
 end
 
 function main()
-    
     #@time histo()
 
     # using the time macro to track performance
-    @time game_of_life()
+    #@time game_of_life()
+    my_matrix = zeros(Int8, 2, 2)
+    for i in CartesianIndices(my_matrix)
+        neighbors = get_neighbors(i[1], i[2])
+        count = 0
+        for n in eachindex(neighbors)
+            i = neighbors[n][1]
+            j = neighbors[n][2]
+            
+            try
+                println(my_matrix[i][j])
+                count += 1
+            catch
+            end
+            
+        end
+        println(count)
+    end
     
 
 end
