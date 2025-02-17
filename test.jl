@@ -39,7 +39,7 @@ end
 
 function game_of_life()
     theme(:dracula ::Symbol;)
-    n = 2
+    n = 300
     my_matrix = generate_starting_pos()
 
     anim = @animate for i in 1:n 
@@ -83,7 +83,7 @@ function game_of_life()
         end
     end
 
-    gif(anim, "anim.mp4", fps=100)
+    gif(anim, "anim.mp4", fps=5)
 end
 
 function get_neighbors(x, y, grid_size)
@@ -108,8 +108,8 @@ function get_neighbors(x, y)
 end
 =#
 function generate_starting_pos()
-    my_matrix = zeros(Int8, 100, 100)
-    spawn_chance = 6
+    my_matrix = zeros(Int8, 60, 60)
+    spawn_chance = 5
 
     # can loop through a row or an index in multidimensional array
     for row in eachrow(my_matrix)
