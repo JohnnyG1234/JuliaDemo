@@ -39,29 +39,26 @@ end
 
 function game_of_life()
     theme(:dracula ::Symbol;)
-    n = 100
+    n = 2
     my_matrix = generate_starting_pos()
 
     anim = @animate for i in 1:n 
         heatmap(my_matrix, color = :greys) 
+        new_matrix  = copy(my_matrix)
         # looping through 2d array with one for loop!!!
         #  https://julialang.org/blog/2016/02/iteration/ more cool Julia looping methods
-        
-        for i in eachrow(my_matrix)
-            for j in  eachcol(my_matrix)
+        for i in CartesianIndices(my_matrix)
             # Julia tuples not zero indexed for some reason.... mathematician moment 🤮
-            neighbors = get_neighbors(i, j, size(my_matrix))
-            
-            #println(i)
+            neighbors = get_neighbors(i[1], i[2], size(my_matrix))
             
             
             neighbor_count = 0
             for n in eachindex(neighbors)
-                i = neighbors[n][1]
-                j = neighbors[n][2]
+                x = neighbors[n][1]
+                y = neighbors[n][2]
 
                 try
-                    if my_matrix[i, j] == 1
+                    if my_matrix[x, y] == 1
                         neighbor_count += 1
                     end
                 catch
@@ -73,20 +70,20 @@ function game_of_life()
             # if cell is alone or to crowded it dies
             if my_matrix[i] == 1
                 if neighbor_count <= 1
-                    my_matrix[i] = 0 
+                    new_matrix[i] = 0 
                 elseif neighbor_count >= 4
-                    my_matrix[i] = 0 
+                    new_matrix[i] = 0 
                 end
             else
-                if neighbor_count == 1
-                    my_matrix[i] = 1
+                if neighbor_count >= 3
+                    new_matrix[i] = 1
                 end
             end
-        end
+            my_matrix = new_matrix
         end
     end
 
-    gif(anim, "anim.mp4", fps=30)
+    gif(anim, "anim.mp4", fps=100)
 end
 
 function get_neighbors(x, y, grid_size)
@@ -111,8 +108,8 @@ function get_neighbors(x, y)
 end
 =#
 function generate_starting_pos()
-    my_matrix = zeros(Int8, 20, 20)
-    spawn_chance = 20
+    my_matrix = zeros(Int8, 100, 100)
+    spawn_chance = 6
 
     # can loop through a row or an index in multidimensional array
     for row in eachrow(my_matrix)
