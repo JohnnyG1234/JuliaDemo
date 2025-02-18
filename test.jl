@@ -43,7 +43,9 @@ function game_of_life()
     my_matrix = generate_starting_pos()
 
     anim = @animate for i in 1:n 
-        heatmap(my_matrix, color = :greys) 
+        if n != 1
+            heatmap(my_matrix, color = :greys) 
+        end 
         new_matrix  = copy(my_matrix)
         # looping through 2d array with one for loop!!!
         #  https://julialang.org/blog/2016/02/iteration/ more cool Julia looping methods
@@ -71,7 +73,7 @@ function game_of_life()
             if my_matrix[i] == 1
                 if neighbor_count <= 1
                     new_matrix[i] = 0 
-                elseif neighbor_count >= 4
+                elseif neighbor_count >= 3
                     new_matrix[i] = 0 
                 end
             else
@@ -109,7 +111,7 @@ end
 =#
 function generate_starting_pos()
     my_matrix = zeros(Int8, 60, 60)
-    spawn_chance = 5
+    spawn_chance = 40
 
     # can loop through a row or an index in multidimensional array
     for row in eachrow(my_matrix)
