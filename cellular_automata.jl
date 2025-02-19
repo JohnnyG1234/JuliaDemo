@@ -1,4 +1,4 @@
-using Plots, Base.Threads
+using Plots, Base.Threads, PlotThemes, ImageMagick
 
 # ----------- Helper Functions -----------
 function get_neighbors(x, y, grid_size)
@@ -7,36 +7,71 @@ function get_neighbors(x, y, grid_size)
     filter(n -> 1 ≤ n[1] ≤ rows && 1 ≤ n[2] ≤ cols, neighbors)
 end
 
-# ----------- Game of Life (Optimized) -----------
-function update_cell(state::Int8, alive_neighbors::Int)
-    if state == 1 && (alive_neighbors < 2 || alive_neighbors > 3)
-        return 0  # Dies
-    elseif state == 0 && alive_neighbors == 3
-        return 1  # Becomes alive
-    end
-    return state  # Remains unchanged
-end
+function generate_starting_pos()
+    my_matrix = zeros(Int8, 60, 60)
+    spawn_chance = 20
 
-function update_game_of_life(grid)
-    rows, cols = size(grid)
-    new_grid = copy(grid)
-
-    @threads for x in 1:rows
-        for y in 1:cols
-            alive_neighbors = count(grid[n...] == 1 for n in get_neighbors(x, y, size(grid)))
-            new_grid[x, y] = update_cell(grid[x, y], alive_neighbors)
+    # can loop through a row or an index in multidimensional array
+    for row in eachrow(my_matrix)
+        for i in eachindex(row)
+            chance = rand(1:100)
+            if chance <= spawn_chance
+                row[i] = 1
+            end
         end
     end
-    return new_grid
+
+    my_matrix
 end
 
-function run_game_of_life(grid_size=(50, 50), steps=100)
-    grid = rand([0, 1], grid_size)
-    anim = @animate for _ in 1:steps
-        heatmap(grid, color=:gray, title="Game of Life")
-        grid = update_game_of_life(grid)
+# ----------- Game of Life (Optimized) -----------
+function game_of_life()
+    theme(:dracula::Symbol;)
+    n = 200
+    my_matrix = generate_starting_pos()
+
+    anim = @animate for i in 1:n
+        if n != 1
+            heatmap(my_matrix, color=:greys)
+        end
+        new_matrix = deepcopy(my_matrix)
+        # looping through 2d array with one for loop!!!
+        #  https://julialang.org/blog/2016/02/iteration/ more cool Julia looping methods
+        for i in CartesianIndices(my_matrix)
+            # Julia tuples not zero indexed for some reason.... mathematician moment 🤮
+            neighbors = get_neighbors(i[1], i[2], size(my_matrix))
+
+
+            neighbor_count = 0
+            for n in eachindex(neighbors)
+                x = neighbors[n][1]
+                y = neighbors[n][2]
+
+                try
+                    if my_matrix[x, y] == 1
+                        neighbor_count += 1
+                    end
+                catch
+                    continue
+                end
+            end
+            #println(neighbor_count)
+
+            # if cell is alone or to crowded it dies
+            if my_matrix[i] == 1
+                if neighbor_count <= 2 || neighbor_count > 3
+                    new_matrix[i] = 0
+                end
+            else
+                if neighbor_count >= 3
+                    new_matrix[i] = 1
+                end
+            end
+            my_matrix = new_matrix
+        end
     end
-    gif(anim, "game_of_life.gif", fps=10)
+
+    gif(anim, "game_of_life.gif", fps=5)
 end
 
 # ----------- Brian's Brain (Optimized) -----------
@@ -115,7 +150,7 @@ function main_menu()
 
         if choice == "1"
             println("\nRunning Game of Life...")
-            run_game_of_life()
+            game_of_life()
             println("Saved as game_of_life.gif!")
         elseif choice == "2"
             println("\nRunning Brian's Brain...")

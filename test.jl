@@ -57,7 +57,7 @@ function game_of_life()
         end
     end
 
-    gif(anim, "anim.mp4", fps=5)
+    gif(anim, "anim.gif", fps=5)
 end
 
 function get_neighbors(x, y, grid_size)
