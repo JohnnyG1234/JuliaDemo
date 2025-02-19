@@ -1,25 +1,33 @@
+#= 
+Uncomment these lines when running for the first time
+import Pkg;
+Pkg.add("Plots")
+Pkg.add("PlotThemes")
+Pkg.add("ImageMagick")
+=#
+
 using Plots
 using PlotThemes
 using ImageMagick
 gr()
 
 function game_of_life()
-    theme(:dracula ::Symbol;)
+    theme(:dracula::Symbol;)
     n = 200
     my_matrix = generate_starting_pos()
 
-    anim = @animate for i in 1:n 
+    anim = @animate for i in 1:n
         if n != 1
-            heatmap(my_matrix, color = :greys) 
-        end 
-        new_matrix  = deepcopy(my_matrix)
+            heatmap(my_matrix, color=:greys)
+        end
+        new_matrix = deepcopy(my_matrix)
         # looping through 2d array with one for loop!!!
         #  https://julialang.org/blog/2016/02/iteration/ more cool Julia looping methods
         for i in CartesianIndices(my_matrix)
             # Julia tuples not zero indexed for some reason.... mathematician moment 🤮
             neighbors = get_neighbors(i[1], i[2], size(my_matrix))
-            
-            
+
+
             neighbor_count = 0
             for n in eachindex(neighbors)
                 x = neighbors[n][1]
@@ -38,7 +46,7 @@ function game_of_life()
             # if cell is alone or to crowded it dies
             if my_matrix[i] == 1
                 if neighbor_count <= 2 || neighbor_count > 3
-                    new_matrix[i] = 0 
+                    new_matrix[i] = 0
                 end
             else
                 if neighbor_count >= 3
@@ -54,7 +62,7 @@ end
 
 function get_neighbors(x, y, grid_size)
     rows, cols = grid_size
-    neighbors = [(x+dx, y+dy) for dx in -1:1 for dy in -1:1 if !(dx == 0 && dy == 0)]
+    neighbors = [(x + dx, y + dy) for dx in -1:1 for dy in -1:1 if !(dx == 0 && dy == 0)]
     filter(n -> 1 ≤ n[1] ≤ rows && 1 ≤ n[2] ≤ cols, neighbors)
 end
 
@@ -76,8 +84,6 @@ function generate_starting_pos()
 end
 
 function main()
-    #@time histo()
-
     # using the time macro to track performance
     @time game_of_life()
 end
